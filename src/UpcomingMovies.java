@@ -8,13 +8,18 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static io.restassured.RestAssured.given;
-
+// Run the main method
 public class UpcomingMovies {
 
     final JsonPath js;
@@ -121,17 +126,26 @@ public class UpcomingMovies {
         for (int i = 0; i < count; i++) {
             String contentAvailable = js.getString("upcomingMovieData[" + i + "].isContentAvailable");
             if (contentAvailable.equalsIgnoreCase("0")) {
-                //put this in a for loop
-                data.put(Integer.toString(count+1),js.getString("upcomingMovieData[" + i + "].isContentAvailable"));
+                data.put(Integer.toString(i),js.getString("upcomingMovieData[" + i + "].movieTitle"));
+                System.out.println(js.getString("upcomingMovieData[" + i + "].movieTitle"));
             }
         }
         Set<String> keyset = data.keySet();
         int rowNum = 0;
         int cellNum = 0;
-        Row row = sheet.createRow(rowNum);
         for(String key : keyset) {
-            Cell cell = row.createCell(cellNum++);
+          //  System.out.println(rowNum+"\t"+cellNum);
+            Row row = sheet.createRow(rowNum++);
+            Cell cell = row.createCell(cellNum);
             cell.setCellValue(data.get(key));
+        }
+        try{
+            FileOutputStream out = new FileOutputStream(new File("/Users/shivantika.t/Downloads/movieData.xlsx"));
+            workbook.write(out);
+            out.close();
+            System.out.println("File created in path : "+("/Users/shivantika.t/Downloads/movieData.xlsx"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
