@@ -1,0 +1,13 @@
+a> Write an SQL query to find nth largest salary along with employee name.
+
+select * from(
+select E.ename, S.sal, dense_rank()
+over(order by S.sal desc)r from Employee E, Salary S where E.EmpID = S.EmpID)
+where r=<nth rank>;
+
+b> Write a query to update salary of employees to 5000 whose age is 30+
+
+Update table Salary
+Set Salary = 5000
+Where EmpID in (select EmpID from Employee e where (Select year(getdate())-year(birthDate) as date
+from Employee E where e.EmpID = E.EmpID)> 30)
